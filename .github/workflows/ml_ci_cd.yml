@@ -11,29 +11,30 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8]
+        python-version: ['3.9'] # Changed from 3.8 to a supported version
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
           python-version: ${{ matrix.python-version }}
-    - name: list 
+    - name: list  
       run: python --version
     - name: pip install
       run: pip install -r requirements.txt
     - name: train model
       run: python model/train.py
     - name: docker build
-      run: docker build -t ${{ secrets.DOCKER_USER }}/${{ secrets.MODEL_NAME }}:${{ github.sha }} .
-          docker build -t ${{ secrets.DOCKER_USER }}/${{ secrets.MODEL_NAME }}:latest .
+      run: |
+        docker build -t ${{ secrets.DOCKER_USER }}/${{ secrets.MODEL_NAME }}:${{ github.sha }} .
+        docker build -t ${{ secrets.DOCKER_USER }}/${{ secrets.MODEL_NAME }}:latest .
     - name: docker login
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       run: |
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
-
     - name: docker push
-      run: docker push ${{ secrets.DOCKER_USER }}/${{ secrets.MODEL_NAME }}:${{ github.sha }}
-          docker push ${{ secrets.DOCKER_USER }}/${{ secrets.MODEL_NAME }}:latest
+      run: |
+        docker push ${{ secrets.DOCKER_USER }}/${{ secrets.MODEL_NAME }}:${{ github.sha }}
+        docker push ${{ secrets.DOCKER_USER }}/${{ secrets.MODEL_NAME }}:latest
