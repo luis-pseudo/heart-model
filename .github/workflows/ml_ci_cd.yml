@@ -26,7 +26,7 @@ jobs:
       run: python model/train.py
     - name: docker build
       run: docker build -t ${{ secrets.DOCKER_USER }}/${{ secrets.MODEL_NAME }}:${{ github.sha }} .
-
+      run: docker build -t ${{ secrets.DOCKER_USER }}/${{ secrets.MODEL_NAME }}:latest .
     - name: docker login
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
@@ -36,3 +36,4 @@ jobs:
 
     - name: docker push
       run: docker push ${{ secrets.DOCKER_USER }}/${{ secrets.MODEL_NAME }}:${{ github.sha }}
+      run: docker push ${{ secrets.DOCKER_USER }}/${{ secrets.MODEL_NAME }}:latest
